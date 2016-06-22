@@ -1,4 +1,4 @@
-# Receive local logs and forward to another fluentd server
+# Receive logs and (possibly) forward to another fluentd server
 
 FROM alpine:3.4
 MAINTAINER Wang <momocraft@gmail.com>
@@ -8,7 +8,7 @@ ENV RUN_DEP ruby ruby-irb
 ENV GEM_OPTIONS --no-ri --no-rdoc
 
 RUN apk add --update $BUILD_DEP $RUN_DEP         && \
-    gem install fluentd $GEM_OPTIONS             && \
+    gem install fluentd fluent-plugin-secure-forward $GEM_OPTIONS && \
     apk del $BUILD_DEP                           && \
     mkdir -pv /fluentd.d /fluentd.sink           && \
     rm -rf /var/cache/apk/*
@@ -29,5 +29,6 @@ EXPOSE 9880
 
 # main config file
 ADD fluentd.conf /root/
+ADD paranoiac.io /root/paranoiac.io
 
 CMD exec fluentd -c /root/fluentd.conf
